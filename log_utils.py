@@ -1,4 +1,5 @@
 import logging
+import logging.handlers
 import os
 
 # 获取当前目录的绝对路径
@@ -22,7 +23,8 @@ def get_logger(name):
     ch.setFormatter(fm)
 
     # 创建一个文件流并设置编码utf8
-    fh = logging.FileHandler(log_dir, encoding='utf-8')
+    fh = logging.handlers.TimedRotatingFileHandler(log_dir, when='D', interval=1, backupCount=30, encoding='utf-8')
+    fh.suffix = '%Y-%m-%d.log'
     fh.setLevel(logging.INFO)
     fh.setFormatter(fm)
 
