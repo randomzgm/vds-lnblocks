@@ -11,10 +11,16 @@ import time
 KEY_AUTH = 'block90'
 GET_WALLET_INFO_BODY = bytes('{"method": "getwalletinfo", "params": [] }', encoding='utf-8')
 EMPTY_BODY = bytes('', encoding='utf-8')
+ENV_SYSTEM = 'production'
 HOST = 'http://localhost:8000/'
 HMAC_USERNAME = 'block90cred'
 HMAC_SECRET = "zkYEGk5KIYfuWgZqCeU6146uctQQVtnc"
 BASIC_AUTH = 'Basic dmlyY2xlOjk5OTAwMA=='
+
+if ENV_SYSTEM == 'production':
+    HOST = 'http://52.82.51.29:8000/'
+    HMAC_SECRET = "rg7mu5mhMlNBZfchfgBQZ0Miki32Sl4i"
+
 
 logger = log_utils.get_logger('wallet_rpc')
 
@@ -83,7 +89,7 @@ def create_hmac_headers(body):
 def call_no_auth():
     logger.debug('--------------- without auth ---------------')
     headers = {'Authorization': BASIC_AUTH}
-    call_rpc(HOST + 'echo', headers, GET_WALLET_INFO_BODY)
+    call_rpc(HOST + 'rpc', headers, GET_WALLET_INFO_BODY)
 
 
 def call_key_auth():
@@ -94,7 +100,7 @@ def call_key_auth():
 
 def call_pl_difficulty():
     logger.debug('--------------- pl get difficulty ---------------')
-    headers = create_hmac_headers(EMPTY_BODY)
+    headers = {}
     call_rpc(HOST + 'pl/api/getdifficulty', headers, EMPTY_BODY, 'GET')
 
 
