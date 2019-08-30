@@ -18,7 +18,7 @@ HMAC_SECRET = "zkYEGk5KIYfuWgZqCeU6146uctQQVtnc"
 BASIC_AUTH = 'Basic dmlyY2xlOjk5OTAwMA=='
 
 if ENV_SYSTEM == 'production':
-    HOST = 'http://52.82.51.29:8000/'
+    HOST = 'https://open.vpubchain.info/'
     HMAC_SECRET = "rg7mu5mhMlNBZfchfgBQZ0Miki32Sl4i"
 
 
@@ -45,7 +45,10 @@ def call_rpc(url, headers, body, req_method='POST'):
         logger.error('response headers: %s', err.headers)
         err_html = err.read().decode('utf-8')
         if err_html:
-            logger.error('response = %s', json.dumps(json.loads(err_html), indent=2))
+            try:
+                logger.error('response = %s', json.dumps(json.loads(err_html), indent=2))
+            except json.decoder.JSONDecodeError:
+                logger.error('response = %s', err_html)
 
 
 def hmac_sha256_base64_encode(secret, str_to_sign):
@@ -72,17 +75,17 @@ def create_hmac_headers(body):
     # 生成当前GMT时间，注意格式不能改变，必须形如：Wed, 14 Aug 2019 09:09:28 GMT
     gm_time = time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime())
     # 拼装待签名的数据
-    str_to_sign = "date: {}\ndigest: {}".format(gm_time, body_digest)
+    str_to_sign = "x-date: {}\ndigest: {}".format(gm_time, body_digest)
     # 生成签名
     signature = hmac_sha256_base64_encode(HMAC_SECRET, str_to_sign)
     logger.debug('to_sign: %s', str_to_sign)
     logger.debug('signature: %s', signature)
     # 拼装headers
     headers = {
-        'Authorization': 'hmac username=\"{}\", algorithm=\"hmac-sha256\", headers=\"date digest\", '
+        'Authorization': 'hmac username=\"{}\", algorithm=\"hmac-sha256\", headers=\"x-date digest\", '
                          'signature=\"{}\"'.format(HMAC_USERNAME, signature),
         'Digest': body_digest,
-        'Date': gm_time}
+        'X-Date': gm_time}
     return headers
 
 
@@ -101,11 +104,18 @@ def call_key_auth():
 def call_pl_difficulty():
     logger.debug('--------------- pl get difficulty ---------------')
     headers = {}
-    call_rpc(HOST + 'pl/api/getdifficulty', headers, EMPTY_BODY, 'GET')
+    call_rpc(HOST + 'ben-pl/api/getdifficulty', headers, EMPTY_BODY, 'GET')
+
+
+def call_user_test():
+    logger.debug('--------------- user test ---------------')
+    headers = create_hmac_headers(EMPTY_BODY)
+    call_rpc(HOST + 'user/user/test', headers, EMPTY_BODY)
 
 
 if __name__ == "__main__":
     # call_no_auth()
     # call_key_auth()
-    call_hmac_auth()
+    # call_hmac_auth()
+    call_user_test()
     call_pl_difficulty()

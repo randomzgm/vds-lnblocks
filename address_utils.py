@@ -61,19 +61,19 @@ def get_private_key(hex_string):
         return bytearray.fromhex(hex_string.zfill(64))
 
 
-def get_public_key(private_key):
+def get_public_key(key):
     # this returns the concatenated x and y coordinates for the supplied private address
     # the prepended 04 is used to signify that it's uncompressed
     if sys.version_info.major > 2:
-        return (bytes.fromhex("04") + SigningKey.from_string(private_key, curve=SECP256k1).verifying_key.to_string())
+        return bytes.fromhex("04") + SigningKey.from_string(key, curve=SECP256k1).verifying_key.to_string()
     else:
-        return (bytearray.fromhex("04") + SigningKey.from_string(private_key,
+        return (bytearray.fromhex("04") + SigningKey.from_string(key,
                                                                  curve=SECP256k1).verifying_key.to_string())
 
 
-def get_public_address(public_key):
-    address = hashlib.sha256(public_key).digest()
-    print("public key hash256: %s" % hashlib.sha256(public_key).hexdigest())
+def get_public_address(key):
+    address = hashlib.sha256(key).digest()
+    print("public key hash256: %s" % hashlib.sha256(key).hexdigest())
     h = hashlib.new('ripemd160')
     h.update(address)
     address = h.digest()
@@ -86,8 +86,9 @@ if __name__ == "__main__":
     private_key = get_private_key("18e14a7b6a307f426a94f8114701e7c8e774e7f9a47e2c2035db29a206321725")
     # print("private key: %s" % binascii.hexlify(private_key).decode())
     # public_key = get_public_key(private_key)
-    public_key = binascii.a2b_hex('044da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126da0a0909f11998130c2d0e86a485f4e79ee466a183a476c432c68758ab9e630b')
+    public_key = binascii.a2b_hex('04a43578ea8e66c6431382aec31d43873678899018893d83ea4819123f32eb327dc8970ef9b41afff40ecbc309fd70353205d1c26ea4fdd871cf583c790b345434')
     print("public_key: %s" % binascii.hexlify(public_key).decode())
     public_address = get_public_address(public_key)
+    # public_address = binascii.a2b_hex('6c50777bc3b841c883ffefa1d25d95cb4bb7469a')
     bitcoin_address = base58_encode("101c", public_address)
     print("Final address %s" % bitcoin_address)
