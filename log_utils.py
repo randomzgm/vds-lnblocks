@@ -1,6 +1,7 @@
 import logging
 import logging.handlers
 import os
+import sys
 
 # 获取当前目录的绝对路径
 BASE_DIR = os.path.dirname(os.path.abspath(__file__)) + '/logs'
@@ -15,10 +16,10 @@ def get_logger(name):
     # 设置最低等级debug
     logger.setLevel(logging.DEBUG)
     # 设置日志格式
-    fm = logging.Formatter('%(asctime)s %(name)s- %(levelname)s - %(message)s')
+    fm = logging.Formatter('%(asctime)s %(name)s[%(levelname)s] - %(message)s')
 
     # 日志输出到屏幕控制台
-    ch = logging.StreamHandler()  # 日志输出到屏幕控制台
+    ch = logging.StreamHandler(sys.stdout)  # 日志输出到屏幕控制台
     ch.setLevel(logging.DEBUG)  # 设置日志等级
     ch.setFormatter(fm)
 
