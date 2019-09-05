@@ -1,0 +1,13 @@
+@startuml
+
+start
+:对body运用SHA-256算法提取摘要  **body_hash**;
+:获取系统当前时间 **gm_time**  ，注意时间格式化;
+:拼接 **gm_time**  与 **body_hash**   ，
+生成HMAC签名   **signature**;
+:把 **gm_time**  与 **body_hash**   分别放入headers;
+:拼接HMAC签名   **signature**   与用户名等信息
+组成 **Authorization**   放入headers;
+stop
+
+@enduml

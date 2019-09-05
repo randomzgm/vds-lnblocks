@@ -1,0 +1,18 @@
+@startuml
+actor Client
+control Kong
+
+autonumber "[#]"
+Client -> Kong: Request With Authentication
+activate Kong
+Kong --> Kong: Check Authentication
+alt Authentication Pass
+    Kong --> Server: Request
+    activate Server
+    return Response
+else Authentication Fail
+    Kong --> Kong: Response With Authentication Fail
+end
+return Response
+
+@enduml
